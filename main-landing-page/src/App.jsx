@@ -1,34 +1,35 @@
-import React from 'react';
-
-const games = [
-  {
-    name: 'Memory Flash Card Game',
-    path: '/memory-flashcard-game/',
-    description: 'A fun, educational memory game for kids with multiple topics and languages.'
-  },
-  // Add more games here as you build them
-];
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 
 function App() {
+  const [count, setCount] = useState(0)
+
   return (
-    <div style={{ maxWidth: 600, margin: '2rem auto', padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
-      <h1>Kids Educational Games</h1>
-      <p>Welcome! Choose a game to play:</p>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {games.map(game => (
-          <li key={game.name} style={{ margin: '1.5rem 0' }}>
-            <a href={game.path} style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#0077cc', textDecoration: 'none' }}>
-              {game.name}
-            </a>
-            <div style={{ fontSize: '0.95rem', color: '#444', marginTop: '0.3rem' }}>{game.description}</div>
-          </li>
-        ))}
-      </ul>
-      <footer style={{ marginTop: '2rem', fontSize: '0.9rem', color: '#888' }}>
-        &copy; {new Date().getFullYear()} Kids Educational Games
-      </footer>
-    </div>
-  );
+    <>
+      <div>
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.jsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </>
+  )
 }
 
-export default App; 
+export default App
