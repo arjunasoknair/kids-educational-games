@@ -84,3 +84,5 @@ kids-educational-games/
 
 ## License
 Open source assets only. No user data is collected. 
+
+https://chelseaarjun.github.io/kids-educational-games/
