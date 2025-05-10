@@ -14,30 +14,26 @@ cd memory-flashcard-game
 npm run build
 cd ..
 
-# Create a temp deploy directory
-deploy_dir=".deploy-gh-pages"
-rm -rf $deploy_dir
-mkdir $deploy_dir
+# Prepare worktree for gh-pages branch
+rm -rf .gh-pages-tmp
+git worktree add .gh-pages-tmp gh-pages || git worktree add .gh-pages-tmp --orphan gh-pages
 
-# Copy landing page build to root of deploy dir
-cp -r main-landing-page/dist/* $deploy_dir/
+# Clean out old files
+rm -rf .gh-pages-tmp/*
 
-# Copy memory game build to subdirectory
-mkdir -p $deploy_dir/memory-flashcard-game
-cp -r memory-flashcard-game/dist/* $deploy_dir/memory-flashcard-game/
+# Copy new build files
+cp -r main-landing-page/dist/* .gh-pages-tmp/
+mkdir -p .gh-pages-tmp/memory-flashcard-game
+cp -r memory-flashcard-game/dist/* .gh-pages-tmp/memory-flashcard-game/
 
-# (Add more games here as needed)
-
-# Commit and push to gh-pages branch
-echo "Deploying to gh-pages branch..."
-git checkout gh-pages || git checkout --orphan gh-pages
-git rm -rf .
-cp -r $deploy_dir/* .
+# Commit and push
+cd .gh-pages-tmp
 git add .
 git commit -m "Deploy to GitHub Pages" || echo "Nothing to commit"
 git push origin gh-pages
+cd ..
 
-git checkout main
-rm -rf $deploy_dir
+# Clean up
+git worktree remove .gh-pages-tmp
 
 echo "Deployment complete!" 
