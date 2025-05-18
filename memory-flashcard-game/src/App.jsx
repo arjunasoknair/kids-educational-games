@@ -17,27 +17,20 @@ function App() {
   return (
     <div
       style={{
-        minHeight: '100dvh',
-        height: '100dvh',
-        width: '100vw',
-        background: '#cce0ff',
+        minHeight: '100vh',
+        minWidth: '100vw',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         boxSizing: 'border-box',
-        padding: 0,
         margin: 0,
-        overflow: 'hidden',
+        padding: 0,
       }}
     >
       <div
         style={{
           width: '100%',
           maxWidth: 500,
-          height: '100%',
-          maxHeight: '100dvh',
-          margin: 0,
           padding: '0.5rem',
           background: '#fff',
           borderRadius: 18,
@@ -45,7 +38,6 @@ function App() {
           display: 'flex',
           flexDirection: 'column',
           gap: '0.5rem',
-          overflow: 'hidden',
           position: 'relative',
         }}
       >
@@ -106,68 +98,42 @@ function App() {
 
         {/* Game Area */}
         <div style={{ 
-          flex: '1 1 0',
-          minHeight: 0,
+          flex: 1,
           display: 'flex',
-          flexDirection: 'column',
-          gap: '0.5rem',
-          overflow: 'hidden',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}>
-          {/* Moves Counter */}
-          <div style={{ 
-            textAlign: 'center', 
-            fontWeight: 600, 
-            fontSize: '1rem', 
-            color: '#6c63ff',
-            padding: '0.3rem 0.7rem',
-            background: '#f0f7ff',
-            borderRadius: 8,
-            alignSelf: 'center',
-          }}>
-            Moves: {moves}
-          </div>
-          
-          {/* Game Grid */}
-          <div style={{
-            flex: 1,
-            minHeight: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-          }}>
-            <MemoryGame 
-              topic={selectedTopic} 
-              language={language} 
-              onMove={() => setMoves(m => m + 1)}
-            />
-          </div>
-          
-          {/* Reset Button */}
-          <button 
-            onClick={() => {
-              setMoves(0);
-              window.location.reload();
-            }}
-            style={{
-              background: '#6c63ff',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              padding: '0.4rem 1rem',
-              fontWeight: 600,
-              fontSize: '1rem',
-              cursor: 'pointer',
-              boxShadow: '0 1px 4px #0001',
-              alignSelf: 'center',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#5b52ff'}
-            onMouseLeave={e => e.currentTarget.style.background = '#6c63ff'}
-          >
-            Reset Game
-          </button>
+          <MemoryGame 
+            topic={selectedTopic} 
+            language={language} 
+            onMove={() => setMoves(m => m + 1)}
+          />
         </div>
+        
+        {/* Reset Button */}
+        <button 
+          onClick={() => {
+            setMoves(0);
+            window.location.reload();
+          }}
+          style={{
+            background: '#6c63ff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '0.4rem 1rem',
+            fontWeight: 600,
+            fontSize: '1rem',
+            cursor: 'pointer',
+            boxShadow: '0 1px 4px #0001',
+            alignSelf: 'center',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#5b52ff'}
+          onMouseLeave={e => e.currentTarget.style.background = '#6c63ff'}
+        >
+          Reset Game
+        </button>
       </div>
     </div>
   );
