@@ -92,10 +92,10 @@ const MemoryGame = ({ language, onMove }) => {
     <div style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: '1.2rem',
+      gap: 'min(2vw, 1rem)',
       width: '100%',
-      maxWidth: 440,
-      margin: '0 auto',
+      maxWidth: '100%',
+      aspectRatio: '1',
       padding: '0.5rem',
       boxSizing: 'border-box',
     }}>
@@ -110,11 +110,10 @@ const MemoryGame = ({ language, onMove }) => {
             style={{
               width: '100%',
               aspectRatio: '1',
-              maxWidth: 110,
-              minWidth: 60,
+              padding: '0.2rem',
               background: isFlipped ? '#fffbe7' : '#cce0ff',
-              border: '2.5px solid #b3b3b3',
-              borderRadius: 16,
+              border: '2px solid #b3b3b3',
+              borderRadius: '12px',
               boxShadow: isFlipped ? '0 2px 12px #0002' : '0 1px 2px #0001',
               cursor: isFlipped ? 'default' : 'pointer',
               transition: 'all 0.25s cubic-bezier(.4,2,.6,1)',
@@ -126,18 +125,37 @@ const MemoryGame = ({ language, onMove }) => {
               outline: isFlipped ? '2px solid #ffd700' : 'none',
               fontFamily: 'Fredoka, sans-serif',
               fontWeight: 600,
-              fontSize: '1.1rem',
+              fontSize: 'clamp(0.8rem, 3vw, 1.1rem)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
             {isFlipped ? (
               <>
-                <span style={{ fontSize: '2.5rem', marginBottom: '0.2rem', display: 'block' }}>{emoji}</span>
-                <span style={{ fontSize: '1.1rem', color: '#333', fontWeight: 700 }}>{text}</span>
+                <span style={{ 
+                  fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', 
+                  marginBottom: '0.2rem', 
+                  display: 'block' 
+                }}>
+                  {emoji}
+                </span>
+                <span style={{ 
+                  fontSize: 'clamp(0.7rem, 2vw, 1.1rem)', 
+                  color: '#333', 
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  padding: '0 0.2rem'
+                }}>
+                  {text}
+                </span>
               </>
             ) : (
-              <span style={{ fontSize: '2.2rem', color: '#6c63ff' }}>❓</span>
+              <span style={{ 
+                fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', 
+                color: '#6c63ff' 
+              }}>
+                ❓
+              </span>
             )}
           </button>
         );

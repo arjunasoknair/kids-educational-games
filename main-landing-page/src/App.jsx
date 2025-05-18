@@ -26,85 +26,118 @@ function App() {
   const cardPadding = 'clamp(1rem, 4vw, 2rem)';
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        width: '100vw',
-        background: 'linear-gradient(135deg, #f9f9ff 0%, #e0f7fa 100%)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        padding: '2rem 0',
-      }}
-    >
+    <div style={{
+      minHeight: '100dvh',
+      width: '100vw',
+      overflowX: 'hidden',
+      padding: '1rem 0',
+      background: 'linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 100%)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      boxSizing: 'border-box',
+    }}>
       <div style={{
+        maxWidth: 520,
         width: '100%',
-        maxWidth: 700,
         margin: '0 auto',
-        padding: '0 1rem',
+        padding: '0 0.5rem',
+        boxSizing: 'border-box',
+      }}>
+        <h1 style={{
+          color: '#6c63ff',
+          fontSize: 'clamp(2rem, 8vw, 3.5rem)',
+          lineHeight: '1.2',
+          margin: '0 0 2rem 0',
+          fontFamily: 'Fredoka, sans-serif',
+          fontWeight: 700,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.2rem',
+        }}>
+          <span>✨ Kids</span>
+          <span>Educational Games</span>
+          <span>✨</span>
+        </h1>
+        <h2 style={{
+          color: '#666',
+          fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
+          fontWeight: 500,
+          margin: '0 0 2rem 0',
+          lineHeight: '1.4',
+        }}>
+          Welcome! Choose a game to play:
+        </h2>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          maxWidth: 500,
+          width: '100%',
+          margin: '0 auto',
+          padding: 0,
+        }}>
+          <a href="./memory-flashcard-game/" style={{
+            background: '#fff1f5',
+            borderRadius: 16,
+            padding: '1rem',
+            textDecoration: 'none',
+            color: 'inherit',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.7rem',
+            width: '100%',
+            maxWidth: 400,
+            margin: '0 auto',
+          }}>
+            <span style={{ fontSize: '2.2rem' }}>🧠</span>
+            <div>
+              <h3 style={{
+                color: '#6c63ff',
+                fontSize: '1.2rem',
+                margin: '0 0 0.3rem 0',
+                fontFamily: 'Fredoka, sans-serif',
+                fontWeight: 600,
+              }}>
+                Memory Flash Card Game
+              </h3>
+              <p style={{
+                margin: 0,
+                color: '#666',
+                lineHeight: '1.4',
+                fontSize: '0.98rem',
+              }}>
+                A fun, educational memory game for kids with multiple topics and languages.
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+      <footer style={{
+        marginTop: 'auto',
+        padding: '2rem 0 1rem 0',
+        color: '#666',
+        fontSize: '0.9rem',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        gap: '0.5rem',
+        width: '100%',
+        maxWidth: 520,
       }}>
-        <h1 style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 700, fontSize: '2.5rem', color: '#6c63ff', marginBottom: '1rem', letterSpacing: '1px', textAlign: 'center' }}>
-          <span role="img" aria-label="sparkles">✨</span> Kids Educational Games <span role="img" aria-label="sparkles">✨</span>
-        </h1>
-        <p style={{ color: '#555', fontSize: '1.1rem', marginBottom: '2.5rem', textAlign: 'center' }}>
-          Welcome! Choose a game to play:
-        </p>
-        <ul style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: '2rem',
-          padding: 0,
-          listStyle: 'none',
-          margin: 0,
-        }}>
-          {games.map(game => (
-            <li key={game.name} style={{
-              background: game.color,
-              border: '2px solid #cce0ff',
-              borderRadius: '18px',
-              boxShadow: '0 2px 12px #0001',
-              width: cardWidth,
-              padding: cardPadding,
-              textAlign: 'center',
-              transition: 'transform 0.18s, box-shadow 0.18s',
-              cursor: 'pointer',
-              position: 'relative',
-              overflow: 'hidden',
-              flex: '1 1 220px',
-              maxWidth: 320,
-              minWidth: 180,
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = 'scale(1.04)';
-              e.currentTarget.style.boxShadow = '0 4px 24px #0002';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 2px 12px #0001';
-            }}
-            >
-              <a href={game.path} style={{ textDecoration: 'none', color: '#6c63ff', display: 'block' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '0.7rem' }}>{game.icon || '🎮'}</div>
-                <div style={{ fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem', fontFamily: 'Fredoka, sans-serif' }}>{game.name}</div>
-                <div style={{ fontSize: '1rem', color: '#555', marginTop: '0.3rem' }}>{game.description}</div>
-              </a>
-            </li>
-          ))}
-        </ul>
-        <footer style={{ marginTop: '3rem', fontSize: '1rem', color: '#888', textAlign: 'center', width: '100%' }}>
-          <div style={{ marginBottom: '0.5rem' }}>
-            <a href="mailto:parent@example.com" style={{ color: '#6c63ff', textDecoration: 'underline', fontWeight: 500 }}>Contact</a> | <span>About</span>
-          </div>
-          <div>
-            &copy; {new Date().getFullYear()} Kids Educational Games &nbsp; <span role="img" aria-label="heart">❤️</span>
-          </div>
-        </footer>
-      </div>
+        <div>
+          <a href="#" style={{ color: '#6c63ff', textDecoration: 'none', marginRight: '0.5rem' }}>Contact</a>
+          |
+          <span style={{ marginLeft: '0.5rem' }}>About</span>
+        </div>
+        <div>© 2025 Kids Educational Games ❤️</div>
+      </footer>
     </div>
   );
 }

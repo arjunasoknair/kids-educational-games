@@ -17,62 +17,58 @@ function App() {
   return (
     <div
       style={{
-        minHeight: '100vh',
-        height: '100vh',
-        width: '100%',
+        minHeight: '100dvh',
+        height: '100dvh',
+        width: '100vw',
         background: '#cce0ff',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         boxSizing: 'border-box',
-        padding: '1rem',
+        padding: 0,
         margin: 0,
+        overflow: 'hidden',
       }}
     >
       <div
         style={{
           width: '100%',
-          maxWidth: 520,
-          minWidth: 320,
+          maxWidth: 500,
+          height: '100%',
+          maxHeight: '100dvh',
           margin: 0,
-          padding: '1rem',
+          padding: '0.5rem',
           background: '#fff',
           borderRadius: 18,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1)',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-          minHeight: '90vh',
-          height: '90vh',
+          gap: '0.5rem',
+          overflow: 'hidden',
           position: 'relative',
         }}
       >
         {/* Back Button */}
-        <div style={{ 
-          flex: '0 0 auto',
-          marginBottom: '1rem',
-        }}>
-          <a href={window.location.pathname.includes('memory-flashcard-game') ? '../' : './'}
-            style={{
-              display: 'inline-block',
-              background: '#e0f7fa',
-              color: '#6c63ff',
-              borderRadius: 8,
-              padding: '0.4rem 1.1rem',
-              fontWeight: 600,
-              fontSize: '1rem',
-              textDecoration: 'none',
-              boxShadow: '0 1px 4px #0001',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#b2ebf2'}
-            onMouseLeave={e => e.currentTarget.style.background = '#e0f7fa'}
-          >
-            ← Back
-          </a>
-        </div>
+        <a 
+          href={window.location.pathname.includes('memory-flashcard-game') ? '../' : './'}
+          style={{
+            alignSelf: 'flex-start',
+            background: '#e0f7fa',
+            color: '#6c63ff',
+            borderRadius: 8,
+            padding: '0.3rem 0.9rem',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            textDecoration: 'none',
+            boxShadow: '0 1px 4px #0001',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#b2ebf2'}
+          onMouseLeave={e => e.currentTarget.style.background = '#e0f7fa'}
+        >
+          ← Back
+        </a>
 
         {/* Title */}
         <h1 style={{ 
@@ -80,57 +76,72 @@ function App() {
           color: '#6c63ff', 
           fontFamily: 'Fredoka, sans-serif', 
           fontWeight: 700, 
-          fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
-          margin: '0 0 1.5rem 0',
+          fontSize: 'clamp(1.3rem, 5vw, 2rem)', 
+          margin: '0',
+          lineHeight: 1.2,
         }}>
           Animal Memory Game
         </h1>
 
         {/* Controls */}
         <div style={{ 
-          flex: '0 0 auto', 
           display: 'flex', 
           justifyContent: 'center', 
-          gap: '1.2rem', 
-          marginBottom: '1.5rem',
+          gap: '0.5rem', 
           flexWrap: 'wrap', 
-          width: '100%' 
         }}>
-          <TopicSelector topics={topics} selectedTopic={selectedTopic} onSelect={() => {}} disabled />
-          <LanguageSelector language={language} onChange={setLanguage} />
+          <TopicSelector 
+            topics={topics} 
+            selectedTopic={selectedTopic} 
+            onSelect={() => {}} 
+            disabled 
+            style={{ flex: '1', minWidth: '120px', maxWidth: '180px' }}
+          />
+          <LanguageSelector 
+            language={language} 
+            onChange={setLanguage}
+            style={{ flex: '1', minWidth: '120px', maxWidth: '180px' }}
+          />
         </div>
 
         {/* Game Area */}
         <div style={{ 
-          flex: '1 1 auto',
-          width: '100%',
+          flex: '1 1 0',
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          gap: '1rem',
-          overflow: 'auto',
-          padding: '0.5rem',
+          gap: '0.5rem',
+          overflow: 'hidden',
         }}>
           {/* Moves Counter */}
           <div style={{ 
             textAlign: 'center', 
             fontWeight: 600, 
-            fontSize: '1.1rem', 
+            fontSize: '1rem', 
             color: '#6c63ff',
-            padding: '0.5rem 1rem',
+            padding: '0.3rem 0.7rem',
             background: '#f0f7ff',
             borderRadius: 8,
-            boxShadow: '0 1px 4px #0001'
+            alignSelf: 'center',
           }}>
             Moves: {moves}
           </div>
           
-          <MemoryGame 
-            topic={selectedTopic} 
-            language={language} 
-            onMove={() => setMoves(m => m + 1)}
-          />
+          {/* Game Grid */}
+          <div style={{
+            flex: 1,
+            minHeight: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden',
+          }}>
+            <MemoryGame 
+              topic={selectedTopic} 
+              language={language} 
+              onMove={() => setMoves(m => m + 1)}
+            />
+          </div>
           
           {/* Reset Button */}
           <button 
@@ -143,12 +154,12 @@ function App() {
               color: '#fff',
               border: 'none',
               borderRadius: 8,
-              padding: '0.5rem 1.2rem',
+              padding: '0.4rem 1rem',
               fontWeight: 600,
               fontSize: '1rem',
               cursor: 'pointer',
               boxShadow: '0 1px 4px #0001',
-              marginTop: 'auto',
+              alignSelf: 'center',
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={e => e.currentTarget.style.background = '#5b52ff'}
