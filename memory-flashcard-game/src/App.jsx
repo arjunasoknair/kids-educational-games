@@ -3,6 +3,7 @@ import TopicSelector from './components/TopicSelector';
 import LanguageSelector from './components/LanguageSelector';
 import MemoryGame from './components/MemoryGame';
 import { getAvailableTopics } from './data/topics';
+import confetti from 'canvas-confetti';
 import './App.css';
 
 function getBestKey(topic, language) {
@@ -18,6 +19,8 @@ function App() {
   const [language, setLanguage] = useState(getInitialLanguage());
   const [moves, setMoves] = useState(0);
   const [best, setBest] = useState(null);
+  const [celebrate, setCelebrate] = useState(false);
+  const [newBest, setNewBest] = useState(false);
 
   // Load best score on topic/language change
   useEffect(() => {
@@ -35,6 +38,37 @@ function App() {
     localStorage.setItem('language', language);
   }, [language]);
 
+  // Confetti celebration
+  useEffect(() => {
+    if (celebrate) {
+      // Normal confetti burst
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+      setTimeout(() => setCelebrate(false), 1200);
+    }
+  }, [celebrate]);
+
+  useEffect(() => {
+    if (newBest) {
+      // Intense confetti + fireworks
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          confetti({
+            particleCount: 120,
+            spread: 120,
+            startVelocity: 50,
+            origin: { x: Math.random(), y: Math.random() * 0.5 },
+            colors: ['#FFD700', '#6c63ff', '#FF69B4', '#00CFFF', '#FF6347'],
+          });
+        }, i * 350);
+      }
+      // Do not auto-hide the message; it will be hidden on reset
+    }
+  }, [newBest]);
+
   const topics = getAvailableTopics();
   console.log('Available topics:', topics);
 
@@ -49,6 +83,9 @@ function App() {
     if (best === null || finalMoves < best) {
       setBest(finalMoves);
       localStorage.setItem(bestKey, finalMoves);
+      setNewBest(true);
+    } else {
+      setCelebrate(true);
     }
   };
 
@@ -56,27 +93,31 @@ function App() {
     <div
       style={{
         minHeight: '100vh',
-        minWidth: '100vw',
+        width: '100vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         boxSizing: 'border-box',
         margin: 0,
         padding: 0,
+        background: '#e6edff',
       }}
     >
       <div
         style={{
           width: '100%',
           maxWidth: 500,
-          padding: '0.5rem',
+          maxHeight: '700px',
+          height: '100%',
+          padding: '0.3rem',
           background: '#fff',
           borderRadius: 18,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.5rem',
+          gap: '0.3rem',
           position: 'relative',
+          overflow: 'visible',
         }}
       >
         {/* Back Button */}
@@ -162,11 +203,30 @@ function App() {
             onComplete={handleGameComplete}
           />
         </div>
+
+        {/* Celebration message for new best (compact reserved space) */}
+        <div style={{
+          minHeight: '1.1rem',
+          margin: '0.3rem 0 0.2rem 0',
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.1rem',
+          fontWeight: 700,
+          color: '#FFD700',
+          textShadow: '0 2px 8px #0002',
+          pointerEvents: 'none',
+          animation: newBest ? 'pop 0.7s' : undefined,
+        }}>
+          {newBest ? '🎉 New Best Score! 🏆' : ''}
+        </div>
         
         {/* Reset Button */}
         <button 
           onClick={() => {
             setMoves(0);
+            setNewBest(false);
             window.location.reload();
           }}
           style={{

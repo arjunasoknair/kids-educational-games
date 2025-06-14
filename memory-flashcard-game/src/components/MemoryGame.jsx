@@ -139,12 +139,17 @@ const MemoryGame = ({ topic, language, onMove, onComplete }) => {
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 'min(2vw, 1rem)',
+        gridTemplateRows: 'repeat(3, 1fr)',
+        gap: 'min(1.5vw, 0.5rem)',
         width: '100%',
         maxWidth: '100%',
-        aspectRatio: '1',
-        padding: '0.5rem',
+        flex: '1 1 auto',
+        minHeight: 0,
         boxSizing: 'border-box',
+        padding: '0.2rem',
+        alignItems: 'stretch',
+        justifyItems: 'stretch',
+        height: 'clamp(220px, 38vh, 340px)',
       }}>
         {cards.map((card, idx) => {
           const isFlipped = flipped.includes(idx) || matched.includes(idx);
@@ -157,7 +162,7 @@ const MemoryGame = ({ topic, language, onMove, onComplete }) => {
               style={{
                 width: '100%',
                 aspectRatio: '1',
-                padding: '0.2rem',
+                padding: '0.1rem',
                 background: isFlipped ? '#fff' : '#cce0ff',
                 border: '2px solid #b3b3b3',
                 borderRadius: '12px',
@@ -171,7 +176,7 @@ const MemoryGame = ({ topic, language, onMove, onComplete }) => {
                 userSelect: 'none',
                 fontFamily: 'Fredoka, sans-serif',
                 fontWeight: 600,
-                fontSize: 'clamp(0.8rem, 3vw, 1.1rem)',
+                fontSize: 'clamp(0.7rem, 2.5vw, 1rem)',
                 position: 'relative',
                 overflow: 'hidden',
               }}
@@ -179,8 +184,8 @@ const MemoryGame = ({ topic, language, onMove, onComplete }) => {
               {isFlipped ? (
                 <>
                   <span style={{ 
-                    fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', 
-                    marginBottom: '0.2rem', 
+                    fontSize: 'clamp(1.1rem, 4vw, 2rem)', 
+                    marginBottom: '0.1rem', 
                     display: 'block',
                     opacity: 1,
                     filter: 'none',
@@ -188,11 +193,11 @@ const MemoryGame = ({ topic, language, onMove, onComplete }) => {
                     {emoji}
                   </span>
                   <span style={{ 
-                    fontSize: 'clamp(0.7rem, 2vw, 1.1rem)', 
+                    fontSize: 'clamp(0.6rem, 1.5vw, 0.95rem)', 
                     color: '#222',
                     fontWeight: 700,
                     textAlign: 'center',
-                    padding: '0 0.2rem',
+                    padding: '0 0.1rem',
                     opacity: 1,
                     filter: 'none',
                   }}>
