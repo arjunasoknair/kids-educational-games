@@ -5,6 +5,10 @@ import MemoryGame from './components/MemoryGame';
 import { getAvailableTopics } from './data/topics';
 import './App.css';
 
+function getBestKey(topic, language) {
+  return `bestScore_${topic}_${language}`;
+}
+
 function App() {
   // Load from localStorage or use default
   const getInitialTopic = () => localStorage.getItem('selectedTopic') || 'animals';
@@ -13,6 +17,15 @@ function App() {
   const [selectedTopic, setSelectedTopic] = useState(getInitialTopic());
   const [language, setLanguage] = useState(getInitialLanguage());
   const [moves, setMoves] = useState(0);
+  const [best, setBest] = useState(null);
+
+  // Load best score on topic/language change
+  useEffect(() => {
+    const bestKey = getBestKey(selectedTopic, language);
+    const bestScore = localStorage.getItem(bestKey);
+    setBest(bestScore ? parseInt(bestScore, 10) : null);
+    setMoves(0); // reset moves on topic/language change
+  }, [selectedTopic, language]);
 
   useEffect(() => {
     localStorage.setItem('selectedTopic', selectedTopic);
@@ -28,6 +41,15 @@ function App() {
   const handleTopicChange = (newTopic) => {
     console.log('Topic selected:', newTopic);
     setSelectedTopic(newTopic);
+  };
+
+  // Called when the game is completed
+  const handleGameComplete = (finalMoves) => {
+    const bestKey = getBestKey(selectedTopic, language);
+    if (best === null || finalMoves < best) {
+      setBest(finalMoves);
+      localStorage.setItem(bestKey, finalMoves);
+    }
   };
 
   return (
@@ -111,6 +133,21 @@ function App() {
           />
         </div>
 
+        {/* Moves and Best Score */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '1.5rem',
+          fontSize: '1.1rem',
+          fontWeight: 600,
+          color: '#444',
+          margin: '0.5rem 0 0.2rem 0',
+        }}>
+          <span>Turns: {moves}</span>
+          <span>Best: {best !== null ? best : '-'}</span>
+        </div>
+
         {/* Game Area */}
         <div style={{ 
           flex: 1,
@@ -122,6 +159,7 @@ function App() {
             topic={selectedTopic} 
             language={language} 
             onMove={() => setMoves(m => m + 1)}
+            onComplete={handleGameComplete}
           />
         </div>
         

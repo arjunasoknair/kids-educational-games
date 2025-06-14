@@ -25,11 +25,12 @@ function getBackLink() {
   return './';
 }
 
-const MemoryGame = ({ topic, language, onMove }) => {
+const MemoryGame = ({ topic, language, onMove, onComplete }) => {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]); // indices
   const [matched, setMatched] = useState([]); // indices
   const [isComplete, setIsComplete] = useState(false);
+  const [moves, setMoves] = useState(0);
   const getInitialMuted = () => {
     const stored = localStorage.getItem('isMuted');
     return stored === null ? false : stored === 'true';
@@ -64,8 +65,9 @@ const MemoryGame = ({ topic, language, onMove }) => {
   useEffect(() => {
     if (matched.length === cards.length && cards.length > 0) {
       setIsComplete(true);
+      if (typeof onComplete === 'function') onComplete(flipped.length === 2 ? moves + 1 : moves);
     }
-  }, [matched, cards]);
+  }, [matched, cards, onComplete, moves, flipped]);
 
   useEffect(() => {
     localStorage.setItem('isMuted', isMuted);
@@ -84,6 +86,7 @@ const MemoryGame = ({ topic, language, onMove }) => {
     
     // Only count a move when the second card is flipped
     if (newFlipped.length === 2) {
+      setMoves(moves + 1);
       onMove();
     }
   };
