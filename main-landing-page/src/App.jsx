@@ -48,6 +48,18 @@ function App() {
               A fun, educational memory game for kids with multiple topics and languages.
             </p>
           </a>
+          <a
+            href="./numbers-game/"
+            className="bg-[#e6edff] rounded-xl p-4 no-underline text-inherit shadow-[0_2px_12px_rgba(0,0,0,0.1)] transition-transform transition-shadow duration-200 flex flex-col items-center gap-1 w-full max-w-[400px] mx-auto"
+          >
+            <span className="text-[2.2rem]">🔢</span>
+            <h3 className="text-[#6c63ff] text-xl sm:text-2xl font-fredoka font-extrabold text-center" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+              Numbers Game
+            </h3>
+            <p className="m-0 leading-snug text-base sm:text-lg text-gray-600 text-center">
+              Practice numbers, listening, and recognition in English and Malayalam.
+            </p>
+          </a>
         </div>
       </div>
       <footer className="w-full max-w-xl mx-auto mt-auto py-8 pb-4 text-sm flex flex-col items-center gap-2">
