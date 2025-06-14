@@ -36,7 +36,7 @@ export const TOPICS = {
       { emoji: '🟢', en: 'Green', ml: 'പച്ച' },
       { emoji: '🟡', en: 'Yellow', ml: 'മഞ്ഞ' },
       { emoji: '🟠', en: 'Orange', ml: 'ഓറഞ്ച്' },
-      { emoji: '🟣', en: 'Purple', ml: 'ഊത' },
+      { emoji: '🟣', en: 'Purple', ml: 'ധൂമ്രം' },
       { emoji: '⚫', en: 'Black', ml: 'കറുപ്പ്' },
       { emoji: '⚪', en: 'White', ml: 'വെള്ള' },
     ],
