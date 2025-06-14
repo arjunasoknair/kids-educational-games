@@ -1,0 +1,32 @@
+{
+  "Africa": [
+    { "name": "Nigeria", "capital": "Abuja", "flag": "/flags/nigeria.png", "iso_a2": "NG" },
+    { "name": "South Africa", "capital": "Pretoria", "flag": "/flags/south_africa.png", "iso_a2": "ZA" },
+    { "name": "Egypt", "capital": "Cairo", "flag": "/flags/egypt.png", "iso_a2": "EG" }
+  ],
+  "Asia": [
+    { "name": "China", "capital": "Beijing", "flag": "/flags/china.png", "iso_a2": "CN" },
+    { "name": "India", "capital": "New Delhi", "flag": "/flags/india.png", "iso_a2": "IN" },
+    { "name": "Japan", "capital": "Tokyo", "flag": "/flags/japan.png", "iso_a2": "JP" }
+  ],
+  "Europe": [
+    { "name": "United Kingdom", "capital": "London", "flag": "/flags/uk.png", "iso_a2": "GB" },
+    { "name": "France", "capital": "Paris", "flag": "/flags/france.png", "iso_a2": "FR" },
+    { "name": "Germany", "capital": "Berlin", "flag": "/flags/germany.png", "iso_a2": "DE" }
+  ],
+  "North America": [
+    { "name": "United States", "capital": "Washington, D.C.", "flag": "/flags/usa.png", "iso_a2": "US" },
+    { "name": "Canada", "capital": "Ottawa", "flag": "/flags/canada.png", "iso_a2": "CA" },
+    { "name": "Mexico", "capital": "Mexico City", "flag": "/flags/mexico.png", "iso_a2": "MX" }
+  ],
+  "South America": [
+    { "name": "Brazil", "capital": "Brasília", "flag": "/flags/brazil.png", "iso_a2": "BR" },
+    { "name": "Argentina", "capital": "Buenos Aires", "flag": "/flags/argentina.png", "iso_a2": "AR" },
+    { "name": "Chile", "capital": "Santiago", "flag": "/flags/chile.png", "iso_a2": "CL" }
+  ],
+  "Oceania": [
+    { "name": "Australia", "capital": "Canberra", "flag": "/flags/australia.png", "iso_a2": "AU" },
+    { "name": "New Zealand", "capital": "Wellington", "flag": "/flags/new_zealand.png", "iso_a2": "NZ" },
+    { "name": "Fiji", "capital": "Suva", "flag": "/flags/fiji.png", "iso_a2": "FJ" }
+  ]
+} 
