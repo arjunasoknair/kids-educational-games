@@ -40,6 +40,29 @@ export default function App() {
   return (
     <div className="min-h-screen w-screen flex items-center justify-center bg-[#e6edff]">
       <div className="w-full max-w-xl max-h-[700px] h-full bg-white rounded-2xl shadow-lg flex flex-col gap-3 p-4 overflow-visible">
+        {/* Back Button */}
+        <a 
+          href="/main-landing-page"
+          style={{
+            alignSelf: 'flex-start',
+            background: '#e0f7fa',
+            color: '#6c63ff',
+            borderRadius: 8,
+            padding: '0.3rem 0.9rem',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            textDecoration: 'none',
+            boxShadow: '0 1px 4px #0001',
+            transition: 'all 0.2s ease',
+            marginBottom: '0.2rem',
+            marginLeft: '0.1rem',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#b2ebf2'}
+          onMouseLeave={e => e.currentTarget.style.background = '#e0f7fa'}
+        >
+          ← Back
+        </a>
+
         {/* Title */}
         <h1 className="text-3xl font-bold text-violet-600 text-center mb-1">Numbers Game</h1>
 
