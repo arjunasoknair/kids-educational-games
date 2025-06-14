@@ -42,7 +42,7 @@ export default function App() {
       <div className="w-full max-w-xl max-h-[700px] h-full bg-white rounded-2xl shadow-lg flex flex-col gap-3 p-4 overflow-visible">
         {/* Back Button */}
         <a 
-          href="/main-landing-page"
+          href="/kids-educational-games/"
           style={{
             alignSelf: 'flex-start',
             background: '#e0f7fa',

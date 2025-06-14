@@ -2,6 +2,12 @@
 
 const audioCache = {};
 
+function getBaseUrl() {
+  return import.meta.env.DEV
+    ? '/kids-educational-games/numbers-game'
+    : '/kids-educational-games/numbers-game';
+}
+
 function padNumber(num) {
   if (num === 1000) return '1000';
   return num.toString().padStart(3, '0');
@@ -9,7 +15,8 @@ function padNumber(num) {
 
 export function getAudioPath(number, language) {
   const padded = padNumber(number);
-  const path = `/audio_assets/${language}/numbers/numbers_${padded}_${language}.wav`;
+  const baseUrl = getBaseUrl();
+  const path = `${baseUrl}/audio_assets/${language}/numbers/numbers_${padded}_${language}.wav`;
   console.log(`Audio path for ${number} (${language}):`, path);
   return path;
 }
@@ -52,10 +59,11 @@ export async function playNumberAudio(number, language, isMuted = false) {
 }
 
 export function playFeedbackAudio(isCorrect, language) {
+  const baseUrl = getBaseUrl();
   if (language === 'both') {
     const type = isCorrect ? 'correct' : 'wrong';
-    const enPath = `/audio_assets/en/feedback/feedback_${type}_en.wav`;
-    const mlPath = `/audio_assets/ml/feedback/feedback_${type}_ml.wav`;
+    const enPath = `${baseUrl}/audio_assets/en/feedback/feedback_${type}_en.wav`;
+    const mlPath = `${baseUrl}/audio_assets/ml/feedback/feedback_${type}_ml.wav`;
     try {
       const enAudio = new Audio(enPath);
       const mlAudio = new Audio(mlPath);
@@ -72,7 +80,7 @@ export function playFeedbackAudio(isCorrect, language) {
   }
   let lang = language;
   const type = isCorrect ? 'correct' : 'wrong';
-  const path = `/audio_assets/${lang}/feedback/feedback_${type}_${lang}.wav`;
+  const path = `${baseUrl}/audio_assets/${lang}/feedback/feedback_${type}_${lang}.wav`;
   try {
     const audio = new Audio(path);
     audio.play();
