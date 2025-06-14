@@ -1,18 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TopicSelector from './components/TopicSelector';
 import LanguageSelector from './components/LanguageSelector';
 import MemoryGame from './components/MemoryGame';
+import { getAvailableTopics } from './data/topics';
 import './App.css';
 
-const topics = [
-  { value: 'animals', label: 'Animals' },
-  // Other topics can be added later
-];
-
 function App() {
-  const [selectedTopic] = useState('animals');
-  const [language, setLanguage] = useState('en');
+  // Load from localStorage or use default
+  const getInitialTopic = () => localStorage.getItem('selectedTopic') || 'animals';
+  const getInitialLanguage = () => localStorage.getItem('language') || 'en';
+
+  const [selectedTopic, setSelectedTopic] = useState(getInitialTopic());
+  const [language, setLanguage] = useState(getInitialLanguage());
   const [moves, setMoves] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem('selectedTopic', selectedTopic);
+  }, [selectedTopic]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
+
+  const topics = getAvailableTopics();
+  console.log('Available topics:', topics);
+
+  const handleTopicChange = (newTopic) => {
+    console.log('Topic selected:', newTopic);
+    setSelectedTopic(newTopic);
+  };
 
   return (
     <div
@@ -72,7 +88,7 @@ function App() {
           margin: '0',
           lineHeight: 1.2,
         }}>
-          Animal Memory Game
+          Memory Game
         </h1>
 
         {/* Controls */}
@@ -85,8 +101,7 @@ function App() {
           <TopicSelector 
             topics={topics} 
             selectedTopic={selectedTopic} 
-            onSelect={() => {}} 
-            disabled 
+            onSelect={handleTopicChange}
             style={{ flex: '1', minWidth: '120px', maxWidth: '180px' }}
           />
           <LanguageSelector 

@@ -23,6 +23,11 @@ export default defineConfig({
     headers: {
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin',
+    },
+    // Configure static file serving
+    static: {
+      directory: resolve(__dirname, 'public'),
+      publicPath: '/kids-educational-games/memory-flashcard-game/'
     }
   }
 })
