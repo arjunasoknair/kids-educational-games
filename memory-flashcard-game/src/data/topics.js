@@ -22,9 +22,10 @@ export const TOPICS = {
       { emoji: '👄', en: 'Mouth', ml: 'വായ' },
       { emoji: '👂', en: 'Ear', ml: 'ചെവി' },
       { emoji: '👋', en: 'Hand', ml: 'കൈ' },
-      { emoji: '🦶', en: 'Foot', ml: 'കാൽ' },
+      { emoji: '🦶', en: 'Foot', ml: 'പാദം' },
       { emoji: '🦵', en: 'Leg', ml: 'കാല്‍' },
-      { emoji: '💪', en: 'Arm', ml: 'കൈകാൽ' },
+      { emoji: '👩‍🦲', en: 'Face', ml: 'മുഖം' },
+      { emoji: '☝️', en: 'Finger', ml: 'വിരൽ' },
     ],
     audioPath: 'body_parts'
   },
