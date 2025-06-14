@@ -19,6 +19,11 @@ cd numbers-game
 npm run build
 cd ..
 
+echo "Building flags & countries game..."
+cd flags-countries-game
+npm run build
+cd ..
+
 # Prepare worktree for gh-pages branch
 rm -rf .gh-pages-tmp
 git worktree add .gh-pages-tmp gh-pages || git worktree add .gh-pages-tmp --orphan gh-pages
@@ -32,6 +37,8 @@ mkdir -p .gh-pages-tmp/memory-flashcard-game
 cp -r memory-flashcard-game/dist/* .gh-pages-tmp/memory-flashcard-game/
 mkdir -p .gh-pages-tmp/numbers-game
 cp -r numbers-game/dist/* .gh-pages-tmp/numbers-game/
+mkdir -p .gh-pages-tmp/flags-countries-game
+cp -r flags-countries-game/dist/* .gh-pages-tmp/flags-countries-game/
 
 # Commit and push
 cd .gh-pages-tmp
