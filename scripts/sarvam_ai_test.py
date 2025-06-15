@@ -1,3 +1,4 @@
+import os
 from dotenv import load_dotenv
 from sarvamai import SarvamAI
 from sarvamai.play import save
@@ -12,8 +13,8 @@ client = SarvamAI(api_subscription_key=API_KEY)
 
 # Convert text to speech
 audio = client.text_to_speech.convert(
-      target_language_code="ml-IN",
-      text="ഒന്ന്",
+      target_language_code="en-IN",
+      text="Germany",
       model="bulbul:v2",
       speaker="vidya",
       pace=0.5,
