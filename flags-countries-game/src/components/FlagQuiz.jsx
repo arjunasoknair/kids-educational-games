@@ -7,6 +7,20 @@ const BASE_MODES = [
   { value: 'country-capital', label: 'Capital', reverse: 'capital-country', reverseLabel: 'Capital → Country' },
 ];
 
+// Add a mapping for continent normalization
+const CONTINENT_MAP = {
+  'Asia': 'Asia',
+  'Africa': 'Africa',
+  'North America': 'North America',
+  'South America': 'South America',
+  'Europe': 'Europe',
+  'Australia': 'Australia',
+  'Oceania': 'Australia', // Map Oceania to Australia
+};
+const CONTINENT_LIST = [
+  'Asia', 'Africa', 'North America', 'South America', 'Europe', 'Australia'
+];
+
 function getRandomOptions(data, correct, field = 'name', count = 3) {
   // Always include the correct answer, then fill with unique incorrect options
   const incorrect = data.filter(item => item[field] !== correct[field]);
@@ -43,19 +57,30 @@ export default function FlagQuiz() {
         return getRandomOptions(FLAGS_DATA, country, 'name', 3);
       case 'country-flag':
         return getRandomOptions(FLAGS_DATA, country, 'flag', 3);
-      case 'country-continent':
-        const uniqueContinents = Array.from(new Set(FLAGS_DATA.map(c => c.continent)));
-        const correctContinent = country.continent;
-        const incorrect = uniqueContinents.filter(cont => cont !== correctContinent);
+      case 'country-continent': {
+        // Use normalized continent names, unique, and not repeated
+        const correctContinent = CONTINENT_MAP[country.continent] || country.continent;
+        const incorrect = CONTINENT_LIST.filter(cont => cont !== correctContinent);
         const shuffled = incorrect.sort(() => 0.5 - Math.random());
         const options = [correctContinent, ...shuffled].slice(0, 3);
-        if (!options.includes(correctContinent)) options[0] = correctContinent;
-        return options.sort(() => 0.5 - Math.random());
-      case 'continent-country':
-        const allContinents = Array.from(new Set(FLAGS_DATA.map(c => c.continent)));
+        // Ensure unique
+        return Array.from(new Set(options)).sort(() => 0.5 - Math.random());
+      }
+      case 'continent-country': {
+        // Pick a random continent
+        const allContinents = CONTINENT_LIST;
         const continent = allContinents[Math.floor(Math.random() * allContinents.length)];
-        const correctCountry = getRandomCountryByContinent(continent);
-        return getRandomOptions(FLAGS_DATA, correctCountry, 'name', 3);
+        // Pick one country from that continent (correct)
+        const correctCountries = FLAGS_DATA.filter(c => (CONTINENT_MAP[c.continent] || c.continent) === continent);
+        const correctCountry = correctCountries[Math.floor(Math.random() * correctCountries.length)];
+        // Pick two countries from other continents (incorrect)
+        const incorrectCountries = FLAGS_DATA.filter(c => (CONTINENT_MAP[c.continent] || c.continent) !== continent);
+        // Ensure unique incorrect options
+        const shuffledIncorrect = incorrectCountries.sort(() => 0.5 - Math.random());
+        const options = [correctCountry, ...shuffledIncorrect.slice(0, 2)];
+        // Shuffle options
+        return options.sort(() => 0.5 - Math.random());
+      }
       case 'country-capital':
         return getRandomOptions(FLAGS_DATA, country, 'capital', 3);
       case 'capital-country':
@@ -72,23 +97,42 @@ export default function FlagQuiz() {
       case 'country-flag':
         return { prompt: <span className="text-xl font-bold text-violet-700">{country.name}</span>, options: options.map(o => o.flag) };
       case 'country-continent':
-        return { prompt: <span className="text-xl font-bold text-violet-700">{country.name}</span>, options };
-      case 'continent-country':
-        const continent = options.find(o => o.continent === o.continent)?.continent || '';
-        return { prompt: <span className="text-xl font-bold text-violet-700">{continent}</span>, options: options.map(o => o.name) };
+        return { prompt: <span className="text-xl font-bold text-violet-700 flex items-center gap-2"><span className="text-4xl">{country.flag}</span> {country.name}</span>, options };
+      case 'continent-country': {
+        // The prompt should be the continent of the correct answer
+        const correctOption = options.find(o => o && (CONTINENT_MAP[o.continent] || o.continent) && CONTINENT_LIST.includes(CONTINENT_MAP[o.continent] || o.continent));
+        const continentPrompt = correctOption ? (CONTINENT_MAP[correctOption.continent] || correctOption.continent) : '';
+        return {
+          prompt: <span className="text-xl font-bold text-violet-700">{continentPrompt}</span>,
+          options: options.map(o => ({ name: o.name, flag: o.flag, continent: CONTINENT_MAP[o.continent] || o.continent })),
+          continentPrompt
+        };
+      }
       case 'country-capital':
-        return { prompt: <span className="text-xl font-bold text-violet-700">{country.name}</span>, options: options.map(o => o.capital) };
+        return { prompt: <span className="text-xl font-bold text-violet-700 flex items-center gap-2"><span className="text-4xl">{country.flag}</span> {country.name}</span>, options: options.map(o => o.capital) };
       case 'capital-country':
-        return { prompt: <span className="text-xl font-bold text-violet-700">{country.capital}</span>, options: options.map(o => o.name) };
+        return {
+          prompt: <span className="text-xl font-bold text-violet-700">{country.capital}</span>,
+          options: options.map(o => ({ name: o.name, flag: o.flag }))
+        };
       default:
         return { prompt: '', options: [] };
     }
   }
 
-  const { prompt, options: displayOptions } = getQuestionForMode(quizMode, current, options);
+  const questionData = getQuestionForMode(quizMode, current, options);
+  const prompt = questionData.prompt;
+  const displayOptions = questionData.options;
+  const continentPromptValue = questionData.continentPrompt;
 
   const handleSelect = (idx) => {
     setSelectedIdx(idx);
+    // If feedback is showing and answer was wrong, allow retry (apply to all modes)
+    if (showFeedback && !isCorrect) {
+      setShowFeedback(false);
+      setIsCorrect(null);
+      setShowNext(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -101,11 +145,17 @@ export default function FlagQuiz() {
       case 'country-flag':
         correct = options[selectedIdx].flag === current.flag;
         break;
-      case 'country-continent':
-        correct = displayOptions[selectedIdx] === current.continent;
+      case 'country-continent': {
+        // Use normalized continent for comparison
+        const correctContinent = CONTINENT_MAP[current.continent] || current.continent;
+        correct = displayOptions[selectedIdx] === correctContinent;
         break;
+      }
       case 'continent-country':
-        correct = options[selectedIdx].name === options.find(o => o.continent === o.continent).name;
+        // The correct answer is the country whose continent matches the prompt
+        const selected = options[selectedIdx];
+        const selectedContinent = CONTINENT_MAP[selected.continent] || selected.continent;
+        correct = selectedContinent === continentPromptValue;
         break;
       case 'country-capital':
         correct = options[selectedIdx].capital === current.capital;
@@ -118,7 +168,7 @@ export default function FlagQuiz() {
     }
     setIsCorrect(correct);
     setShowFeedback(true);
-    setShowNext(true);
+    if (correct) setShowNext(true);
   };
 
   const handleNext = () => {
@@ -228,23 +278,27 @@ export default function FlagQuiz() {
               <div className="flex flex-row flex-wrap gap-3 justify-center mt-2 w-full">
                 {displayOptions.map((opt, idx) => (
                   <button
-                    key={typeof opt === 'string' ? opt : idx}
-                    className={`rounded-xl font-extrabold shadow transition-all duration-100 border-2 w-32 flex items-center justify-center
-                      ${isFlagOptionMode ? 'text-7xl sm:text-8xl py-6' : 'px-4 py-2 text-lg sm:text-xl'}
+                    key={typeof opt === 'string' ? opt : opt.name || idx}
+                    className={`rounded-xl font-extrabold shadow transition-all duration-100 border-2 w-36 max-w-full flex flex-col items-center justify-center px-2 py-2 whitespace-normal break-words
+                      ${isFlagOptionMode ? 'text-7xl sm:text-8xl py-6' : 'text-lg sm:text-xl'}
                       ${selectedIdx === idx ? 'bg-violet-300 border-violet-600' : 'bg-violet-50 border-violet-100 hover:bg-violet-100 hover:border-violet-300'}
                       ${showFeedback && idx === displayOptions.findIndex(o => {
-                        if (quizMode === 'country-continent') return o === current.continent;
-                        if (quizMode === 'continent-country') return o === correctCountry.name;
+                        if (quizMode === 'country-continent') {
+                          const correctContinent = CONTINENT_MAP[current.continent] || current.continent;
+                          return o === correctContinent;
+                        }
+                        if (quizMode === 'continent-country') return (o.name || o) === correctCountry.name;
                         if (quizMode === 'country-capital') return o === current.capital;
-                        if (quizMode === 'capital-country') return o === current.name;
+                        if (quizMode === 'capital-country') return (o.name || o) === current.name;
                         return o === (quizMode === 'country-flag' ? current.flag : current.name);
                       }) && isCorrect ? 'bg-green-100 border-green-500' : ''}
                       ${showFeedback && idx === selectedIdx && !isCorrect ? 'bg-red-100 border-red-500' : ''}`}
                     onClick={() => handleSelect(idx)}
-                    disabled={showFeedback}
+                    disabled={isCorrect}
                     aria-label={`Select option ${typeof opt === 'string' ? opt : idx}`}
                   >
-                    {opt}
+                    {typeof opt === 'object' && opt.flag ? <span className="text-4xl mb-1">{opt.flag}</span> : null}
+                    <span className="text-center w-full whitespace-normal break-words">{typeof opt === 'object' && opt.name ? opt.name : opt}</span>
                   </button>
                 ))}
               </div>
