@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FLAGS_DATA } from '../data/flags';
+import { playSound, preloadAudio } from '../utils/audio';
 
 const BASE_MODES = [
   { value: 'flag-country', label: 'Flags', reverse: 'country-flag', reverseLabel: 'Country → Flag' },
@@ -42,6 +43,37 @@ function getRandomCountryByContinent(continent) {
   return filtered[Math.floor(Math.random() * filtered.length)];
 }
 
+// Audio player hook
+function useAudioPlayer() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = React.useRef(null);
+
+  const play = (src, onEnded) => {
+    if (!src) return;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    audioRef.current = new window.Audio(src);
+    setIsPlaying(true);
+    audioRef.current.onended = () => {
+      setIsPlaying(false);
+      if (onEnded) onEnded();
+    };
+    audioRef.current.play();
+  };
+
+  const stop = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+    }
+  };
+
+  return { play, stop, isPlaying };
+}
+
 export default function FlagQuiz() {
   const [quizMode, setQuizMode] = useState('flag-country');
   const [current, setCurrent] = useState(() => getRandomCountry());
@@ -50,6 +82,25 @@ export default function FlagQuiz() {
   const [isCorrect, setIsCorrect] = useState(null);
   const [options, setOptions] = useState(() => getOptionsForMode('flag-country', getRandomCountry()));
   const [showNext, setShowNext] = useState(false);
+  // Global audio state
+  const [isMuted, setIsMuted] = useState(() => {
+    const stored = localStorage.getItem('isMuted');
+    return stored ? JSON.parse(stored) : false;
+  });
+  const [malayalamEnabled, setMalayalamEnabled] = useState(() => {
+    const stored = localStorage.getItem('malayalamEnabled');
+    return stored ? JSON.parse(stored) : false;
+  });
+
+  const audioBase = '/audio_assets/flags';
+  const { play, stop, isPlaying } = useAudioPlayer();
+
+  useEffect(() => {
+    localStorage.setItem('isMuted', JSON.stringify(isMuted));
+  }, [isMuted]);
+  useEffect(() => {
+    localStorage.setItem('malayalamEnabled', JSON.stringify(malayalamEnabled));
+  }, [malayalamEnabled]);
 
   function getOptionsForMode(mode, country) {
     switch (mode) {
@@ -140,28 +191,27 @@ export default function FlagQuiz() {
     let correct = false;
     switch (quizMode) {
       case 'flag-country':
-        correct = options[selectedIdx].name === current.name;
+        correct = displayOptions[selectedIdx] === current.name;
         break;
       case 'country-flag':
-        correct = options[selectedIdx].flag === current.flag;
+        correct = displayOptions[selectedIdx] === current.flag;
         break;
       case 'country-continent': {
-        // Use normalized continent for comparison
         const correctContinent = CONTINENT_MAP[current.continent] || current.continent;
         correct = displayOptions[selectedIdx] === correctContinent;
         break;
       }
-      case 'continent-country':
-        // The correct answer is the country whose continent matches the prompt
-        const selected = options[selectedIdx];
+      case 'continent-country': {
+        const selected = displayOptions[selectedIdx];
         const selectedContinent = CONTINENT_MAP[selected.continent] || selected.continent;
         correct = selectedContinent === continentPromptValue;
         break;
+      }
       case 'country-capital':
-        correct = options[selectedIdx].capital === current.capital;
+        correct = displayOptions[selectedIdx] === current.capital;
         break;
       case 'capital-country':
-        correct = options[selectedIdx].name === current.name;
+        correct = displayOptions[selectedIdx].name === current.name;
         break;
       default:
         break;
@@ -176,14 +226,8 @@ export default function FlagQuiz() {
     setSelectedIdx(null);
     setIsCorrect(null);
     setShowNext(false);
-    let newCountry = getRandomCountry();
-    let newOptions = getOptionsForMode(quizMode, newCountry);
-    if (quizMode === 'continent-country') {
-      const allContinents = Array.from(new Set(FLAGS_DATA.map(c => c.continent)));
-      const continent = allContinents[Math.floor(Math.random() * allContinents.length)];
-      newCountry = getRandomCountryByContinent(continent);
-      newOptions = getRandomOptions(FLAGS_DATA, newCountry, 'name', 3);
-    }
+    const newCountry = getRandomCountry();
+    const newOptions = getOptionsForMode(quizMode, newCountry);
     setCurrent(newCountry);
     setOptions(newOptions);
   };
@@ -211,9 +255,121 @@ export default function FlagQuiz() {
   // Helper to determine if current mode is a flag option mode
   const isFlagOptionMode = quizMode === 'country-flag';
 
+  // Play audio for option (country, continent, capital)
+  const handleOptionAudio = (opt, mode) => {
+    if (isMuted) return;
+    if (opt === undefined || opt === null) {
+      console.warn('handleOptionAudio called with undefined or null opt:', opt, 'mode:', mode);
+      return;
+    }
+    let name, type;
+    if (mode === 'flag-country') {
+      if (typeof opt === 'string') {
+        name = opt;
+        type = 'country';
+      } else if (typeof opt === 'object' && opt.name) {
+        name = opt.name;
+        type = 'country';
+      } else {
+        console.warn('Expected string or object with name for country name in flag-country mode, but got:', opt);
+        return;
+      }
+    } else if (mode === 'country-flag') {
+      // opt is a flag string, need to find the country by flag
+      const country = FLAGS_DATA.find(c => c.flag === opt);
+      if (country) {
+        name = country.name;
+        type = 'country';
+      } else {
+        console.warn('Could not find country for flag in country-flag mode:', opt);
+        return;
+      }
+    } else if (mode === 'country-continent') {
+      if (typeof opt === 'string') {
+        name = opt;
+        type = 'continent';
+      } else {
+        console.warn('Expected string for continent in mode', mode, 'but got:', opt);
+        return;
+      }
+    } else if (mode === 'continent-country') {
+      if (typeof opt === 'object' && opt.name) {
+        name = opt.name;
+        type = 'country';
+      } else {
+        console.warn('Expected country object with name for mode', mode, 'but got:', opt);
+        return;
+      }
+    } else if (mode === 'country-capital') {
+      if (typeof opt === 'string') {
+        name = opt;
+        type = 'capital';
+      } else {
+        console.warn('Expected string for capital in mode', mode, 'but got:', opt);
+        return;
+      }
+    } else if (mode === 'capital-country') {
+      if (typeof opt === 'object' && opt.name) {
+        name = opt.name;
+        type = 'country';
+      } else {
+        console.warn('Expected country object with name for mode', mode, 'but got:', opt);
+        return;
+      }
+    }
+    playSound(name, 'en', type, isMuted);
+  };
+
+  // Play fun fact audio after correct answer
+  useEffect(() => {
+    if (showFeedback && isCorrect && !isMuted) {
+      const name = quizMode === 'continent-country' && correctCountry ? correctCountry.name : current.name;
+      playSound(name, malayalamEnabled ? 'both' : 'en', 'fact', isMuted);
+    }
+  }, [showFeedback, isCorrect, malayalamEnabled, isMuted, quizMode, correctCountry, current]);
+
+  // Play button for quiz prompt in reverse modes
+  const handlePromptAudio = () => {
+    if (isMuted) return;
+    let name, type;
+    if (quizMode === 'country-flag' || quizMode === 'country-continent' || quizMode === 'country-capital') {
+      name = current.name;
+      type = 'country';
+    } else if (quizMode === 'flag-country') {
+      name = current.name;
+      type = 'country';
+    } else if (quizMode === 'capital-country') {
+      name = current.capital;
+      type = 'capital';
+    } else if (quizMode === 'continent-country' && correctCountry) {
+      name = correctCountry.name;
+      type = 'country';
+    }
+    if (name) playSound(name, 'en', type, isMuted);
+  };
+
   return (
     <div className="min-h-screen w-screen flex items-center justify-center bg-[#fffbe6] p-2 sm:p-6">
       <div className="w-full max-w-xl max-h-[700px] h-full bg-[#fffbe6] rounded-2xl shadow-xl flex flex-col gap-3 p-4 overflow-visible border-4 border-[#f7f3d7]">
+        {/* Global Audio Controls */}
+        <div className="flex flex-row gap-4 items-center justify-end mb-2">
+          <button
+            className={`px-3 py-1 rounded-full font-semibold border-2 flex items-center gap-2 transition-colors ${isMuted ? 'bg-gray-200 border-gray-400 text-gray-500' : 'bg-green-100 border-green-400 text-green-700'}`}
+            onClick={() => setIsMuted(m => !m)}
+            aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+          >
+            {isMuted ? <span role="img" aria-label="Muted">🔇</span> : <span role="img" aria-label="Unmuted">🔊</span>}
+            {isMuted ? 'Muted' : 'Sound On'}
+          </button>
+          <button
+            className={`px-3 py-1 rounded-full font-semibold border-2 flex items-center gap-2 transition-colors ${malayalamEnabled ? 'bg-blue-100 border-blue-400 text-blue-700' : 'bg-gray-100 border-gray-300 text-gray-500'}`}
+            onClick={() => setMalayalamEnabled(m => !m)}
+            aria-label={malayalamEnabled ? 'Disable Malayalam' : 'Enable Malayalam'}
+          >
+            <span role="img" aria-label="Malayalam">🌐</span>
+            {malayalamEnabled ? 'Malayalam ON' : 'Malayalam OFF'}
+          </button>
+        </div>
         {/* Back Button */}
         <a
           href="/kids-educational-games/"
@@ -234,8 +390,9 @@ export default function FlagQuiz() {
                 onClick={() => {
                   setQuizMode(mode.value);
                   const newCountry = getRandomCountry();
+                  const newOptions = getOptionsForMode(mode.value, newCountry);
                   setCurrent(newCountry);
-                  setOptions(getOptionsForMode(mode.value, newCountry));
+                  setOptions(newOptions);
                   setSelectedIdx(null);
                   setShowFeedback(false);
                   setIsCorrect(null);
@@ -278,7 +435,7 @@ export default function FlagQuiz() {
               <div className="flex flex-row flex-wrap gap-3 justify-center mt-2 w-full">
                 {displayOptions.map((opt, idx) => (
                   <button
-                    key={typeof opt === 'string' ? opt : opt.name || idx}
+                    key={typeof opt === 'object' && opt.name ? opt.name : opt || idx}
                     className={`rounded-xl font-extrabold shadow transition-all duration-100 border-2 w-36 max-w-full flex flex-col items-center justify-center px-2 py-2 whitespace-normal break-words
                       ${isFlagOptionMode ? 'text-7xl sm:text-8xl py-6' : 'text-lg sm:text-xl'}
                       ${selectedIdx === idx ? 'bg-violet-300 border-violet-600' : 'bg-violet-50 border-violet-100 hover:bg-violet-100 hover:border-violet-300'}
@@ -293,12 +450,26 @@ export default function FlagQuiz() {
                         return o === (quizMode === 'country-flag' ? current.flag : current.name);
                       }) && isCorrect ? 'bg-green-100 border-green-500' : ''}
                       ${showFeedback && idx === selectedIdx && !isCorrect ? 'bg-red-100 border-red-500' : ''}`}
-                    onClick={() => handleSelect(idx)}
+                    onClick={() => {
+                      handleSelect(idx);
+                      handleOptionAudio(opt, quizMode);
+                    }}
                     disabled={isCorrect}
                     aria-label={`Select option ${typeof opt === 'string' ? opt : idx}`}
                   >
-                    {typeof opt === 'object' && opt.flag ? <span className="text-4xl mb-1">{opt.flag}</span> : null}
-                    <span className="text-center w-full whitespace-normal break-words">{typeof opt === 'object' && opt.name ? opt.name : opt}</span>
+                    {/* For country-flag and capital-country, show flag only or flag+name */}
+                    {quizMode === 'country-flag' && <span className="text-4xl mb-1">{opt}</span>}
+                    {quizMode === 'capital-country' && <span className="text-4xl mb-1">{opt.flag}</span>}
+                    {quizMode === 'continent-country' && <span className="text-4xl mb-1">{opt.flag}</span>}
+                    {/* For all modes, show name or capital as appropriate */}
+                    <span className="text-center w-full whitespace-normal break-words">
+                      {quizMode === 'flag-country' && opt}
+                      {quizMode === 'country-flag' && ''}
+                      {quizMode === 'country-continent' && opt}
+                      {quizMode === 'continent-country' && opt.name}
+                      {quizMode === 'country-capital' && opt}
+                      {quizMode === 'capital-country' && opt.name}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -316,12 +487,27 @@ export default function FlagQuiz() {
               )}
             </>
           )}
+          {/* Play button for quiz prompt in reverse modes */}
+          {['country-flag', 'country-continent', 'country-capital', 'capital-country', 'continent-country'].includes(quizMode) && (
+            <div className="flex justify-center mt-2">
+              <button
+                className="px-3 py-1 rounded-full bg-yellow-100 border border-yellow-400 text-yellow-700 font-semibold flex items-center gap-2"
+                onClick={handlePromptAudio}
+                aria-label="Play question audio"
+                disabled={isMuted}
+              >
+                <span role="img" aria-label="Play">🔊</span> Play Question Audio
+              </button>
+            </div>
+          )}
           {/* Fun Fact and Details after correct answer */}
           {showFunFact && (
             <div className="mt-3 p-3 bg-violet-50 rounded-xl shadow text-center max-w-full w-full flex flex-col items-center justify-center">
               <div className="font-bold text-violet-700 mb-1 text-lg sm:text-xl">Fun Fact:</div>
               <div className="text-base text-violet-800 mb-1 break-words max-w-[90vw] w-full sm:max-w-xl mx-auto">{(quizMode === 'continent-country' ? correctCountry.funFactEn : current.funFactEn)}</div>
-              <div className="text-base text-violet-700 italic break-words max-w-[90vw] w-full sm:max-w-xl mx-auto">{(quizMode === 'continent-country' ? correctCountry.funFactMl : current.funFactMl)}</div>
+              {malayalamEnabled && (
+                <div className="text-base text-violet-700 italic break-words max-w-[90vw] w-full sm:max-w-xl mx-auto">{(quizMode === 'continent-country' ? correctCountry.funFactMl : current.funFactMl)}</div>
+              )}
               <div className="mt-2 text-sm text-gray-600">Continent: <span className="font-semibold text-violet-700">{(quizMode === 'continent-country' ? correctCountry.continent : current.continent)}</span></div>
               <div className="text-sm text-gray-600">Capital: <span className="font-semibold text-violet-700">{(quizMode === 'continent-country' ? correctCountry.capital : current.capital)}</span></div>
             </div>
